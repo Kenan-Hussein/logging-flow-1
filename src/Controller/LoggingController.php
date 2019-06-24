@@ -15,7 +15,7 @@ class LoggingController extends AbstractController
     {
         return new JsonResponse(
             [
-                'message' => 'yeaaah it is working',
+                'message' => 'yeaah it is working',
             ],
             JsonResponse::HTTP_OK
         );
