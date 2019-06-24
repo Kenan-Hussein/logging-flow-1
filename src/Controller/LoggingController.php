@@ -9,7 +9,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class LoggingController extends AbstractController
 {
     /**
-     * @Route("/logging", name="logging", methods={"POST"})
+     * @Route("/logging", name="logging")
      */
     public function postLog()
     {
