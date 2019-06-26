@@ -38,9 +38,47 @@ Make sure JDK_HOME is enabled in your paths file, this is how windows knows wher
 
 
 
-## CRUD Operations (Create, Read, Update, Delete Queries)
+### Basic Command Structure in Kibana 
 
-### The Bulk API of the Elasticsearch 
+
+
+<REST Verb> <Node>/<API Name>
+
+{
+
+​	<Additional Data in JSON Format>
+
+}
+
+
+
+<b> Example </b>
+
+GET /bank/_search
+
+{
+
+​	"query":{
+
+​	}
+
+}
+
+Will Explain That in Later Sections.
+
+
+
+
+
+## Create Data
+
+
+
+This section is detected to the create interactions with the search engine,
+
+
+
+### The Bulk API of the Elasticsearch (C as Create from CRUD)
 
 Example Data:
 
@@ -59,16 +97,6 @@ and Don't Forget the Body
 
 
 and Hit Send :), What a magic, you've done it!. Thank Me? your welcome.
-
-
-
-But how Can i Check if it's there?
-
-
-
-### Get Request AKA, Read (the R in CRUD):
-
-the command is quiet simple which is: `Get /my-test` now enter this in Kibana and you'll see the data.
 
 
 
@@ -94,10 +122,229 @@ but i couldn't let it work in PowerShell First there was `@accounts.json` and wh
 
 There seems to be a problem with the header :|
 
+
+
+<b>But how Can i Check if it's there?</b>
+
+
+
+## Read Data 
+
+### Get Request AKA, Read (the R in CRUD):
+
+the command is quiet simple which is: `Get /bank` now enter this in Kibana and you'll see a response representing the structure of the data.
+
+to see some actual data we should use Search API
+
 ### Read Index 
+
+##### `We will be using Bank data from now on, make sure you post it using Post man copying the content of accounts.json into the body of the Request`
+
+
 
 in Kitana use the command: 
 
 `GET /_cat/indices`
 
+What this shows is the Indexes of all the data we entered.
+
+we can use the names of any index from here in the search API
+
 ### Search API
+
+the basic terminology goes like this:
+
+`GET /bank/_search  {<query data>}`
+
+so, first notice the `_search` which is used to indicate which API we are using.
+
+second this `<query data>` and it's used with many verbs
+
+third, this commands are executed in Kibana 
+
+<b>match: </b>
+
+it goes like this in Kitana:
+
+```json
+GET /bank/_search
+"query": {
+"match": {
+"age":32
+}
+}
+}
+```
+
+inside the "match" JSON we specify the fields and the expected values.
+
+<b>match_all:</b>
+
+shows everything the "Database" has in this index.
+
+```json
+GET /bank/_search
+{
+"query": {
+"match_all": {}
+}
+}
+```
+
+or you can use `GET /bank/_search`  for short
+
+<b> Querys With multible Matches:</b>
+
+this example illustrates the concept 
+
+```json
+GET /bank/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "city": "Brogan"
+          }
+        },{
+          "match": {
+            "state": "IL"
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+so, we used `match` Term to replicate the `=` sign or `equals` in other SQL, PHP based operations.
+
+plus we used the `must` term to indicate the importance of this search terms.
+
+##### More Complex Queries 
+
+Lets say you want the list of the accounts in `CA` state and you would like to boost Men Named `Smith` in your search result, this is how you do it using internal queries 
+
+```
+GET /bank/_search
+{
+  "query": {
+    "bool": {
+      "should": [
+        {
+          "match": {
+            "state": "CA"
+          }
+        },{
+          "match": {
+            "lastname": {
+              "query": "Smith", "boost": 3
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+in my case there was the fallowing snippet of the result:
+
+![](./complex_query_result.jpg)
+
+Notice the there was somebody here that doesn't live in CA, and that's the deference between `must` and `should`, notice also that i used insider query in the Command i sent, this is to be explained in more details later.
+
+but what is interesting also is the way Elastic search the relevant of the item regarding the query, notice in the `boost` i used number 3 which counts as 3 times more important than the `state` term.
+
+#### More than & Less Than Queries 
+
+So, if you wan't to get the accounts from `512` to lets say `600` you would use the fallowing format:
+
+```
+GET /bank/_search
+{
+  "query": {
+    "range": {
+      "account_number": {
+        "gte": 512,
+        "lte": 600
+      }
+    }
+  }
+}
+```
+
+there is a couple of things here:
+
+`gte` stand for Greater Than or Equal To.
+
+`lte` stands for Less than or equal to.
+
+and we used `range` instead of match here.	
+
+#### Aggregations of Queries 
+
+This is used to add, count and so on...
+
+##### Count Based on Field
+
+so lets say we wanna know the number off accounts for every state, that would be the fallowing 
+```json
+GET /bank/_search 
+{
+  "size": 0,
+  "aggs": {
+    "states": {
+      "terms": {
+        "field": "state.keyword"
+      }
+    }
+  }
+}
+```
+
+That seems to be hard, so lets walk throw it: first the `size` and we used this to tell elastic search that we don't want the results, just the aggregations back,
+
+next `aggs` this is the way we tell Elastic Search to count data
+
+next `terms`, it's works in a similar way to `match`, just another way of writing the query. we will discuss this later.
+
+##### Averaging Data
+
+Goal: Getting the average balance per state
+
+Code:
+
+```
+GET bank/_search
+{
+  "size": 0,
+  "aggs": {
+    "states": {
+      "terms": {
+        "field": "state.keyword"
+      },
+      "aggs": {
+        "avg_bal": {
+          "avg": {
+            "field": "balance"
+          }
+        }
+      }
+    }
+  }
+}
+
+```
+
+So, `size` Means i just want the aggregations , `states` is the name of aggregation, it works in similar way to `AS` in SQL. `terms` Explained Above, Well not yet but working on it ;), but in a nutshell it operates like `match` Now that I explained above.
+
+`aggs` inside after the `terms` is used to calculate the average balance, how? here's how it goes, first `avg_bal` is just the name of the field, works like `AS` in SQL,  `avg` is a tag used to tell the search engine of the aggregation type, next we just added the name of the field.
+
+for full list of aggregations go to 
+
+https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-avg-aggregation.html
+
+and navigate from there.
+
