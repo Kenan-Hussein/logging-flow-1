@@ -40,39 +40,37 @@ Make sure JDK_HOME is enabled in your paths file, this is how windows knows wher
 
 ### Basic Command Structure in Kibana 
 
-
-
+```
 <REST Verb> <Node>/<API Name>
 
 {
 
-​	<Additional Data in JSON Format>
+<Additional Data in JSON Format>
 
 }
+```
 
 
 
 <b> Example </b>
 
+```
 GET /bank/_search
 
 {
 
-​	"query":{
+	"query":{
 
-​	}
+	}
 
 }
+```
 
 Will Explain That in Later Sections.
 
 
 
-
-
 ## Create Data
-
-
 
 This section is detected to the create interactions with the search engine,
 
@@ -114,7 +112,9 @@ Well, I couldn't find a way because of the way PowerShell operates,
 
  The main Command was 
 
-`curl -H 'Content-Type: application/x-ndjson' -XPOST 'localhost:9200/bank/account/_bulk?pretty' --data-binary @accounts.json`
+```
+curl -H 'Content-Type: application/x-ndjson' -XPOST 'localhost:9200/bank/account/_bulk?pretty' --data-binary @accounts.json
+```
 
 but i couldn't let it work in PowerShell First there was `@accounts.json` and when i fixed it
 
