@@ -257,6 +257,42 @@ Notice the there was somebody here that doesn't live in CA, and that's the defer
 
 but what is interesting also is the way Elastic search the relevant of the item regarding the query, notice in the `boost` i used number 3 which counts as 3 times more important than the `state` term.
 
+
+
+#### Terms Query
+
+Using the terms Query Proved Essential in fallowing the Tutorials i provide here, that's why i'm gonna explain it now:
+
+The way this thing works is like this:
+
+```
+GET bank/account/_search
+{
+  "query": {
+    "term": {
+      "account_number": 516
+    }
+  }
+}
+```
+
+Notice here that we used `term` to ask for something similar to a `match` query, <b>BUT</b> be careful how you use this as a query like this proved to be ill resulted
+
+```
+GET bank/account/_search
+{
+  "query": {
+    "term": {
+      "state": "RI"
+    }
+  }
+}
+```
+
+So, as a basic Rule use `term` Queries for numerical values.
+
+
+
 #### More than & Less Than Queries 
 
 So, if you wan't to get the accounts from `512` to lets say `600` you would use the fallowing format:
@@ -338,7 +374,7 @@ GET bank/_search
 
 ```
 
-So, `size` Means i just want the aggregations , `states` is the name of aggregation, it works in similar way to `AS` in SQL. `terms` Explained Above, Well not yet but working on it ;), but in a nutshell it operates like `match` Now that I explained above.
+So, `size` Means i just want the aggregations , `states` is the name of aggregation, it works in similar way to `AS` in SQL. `terms` Explained Above, but in a nutshell it operates like `match` Now that I explained above.
 
 `aggs` inside after the `terms` is used to calculate the average balance, how? here's how it goes, first `avg_bal` is just the name of the field, works like `AS` in SQL,  `avg` is a tag used to tell the search engine of the aggregation type, next we just added the name of the field.
 
@@ -348,3 +384,40 @@ https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregati
 
 and navigate from there.
 
+
+
+#### Filtering Aggregations 
+
+we can use the `match` in the query as fallowing 
+
+```
+GET bank/account/_search
+{
+  "size": 0,
+  "query": {
+    "match": {"state.keyword": "CA"}
+  },
+  "aggs": {
+    "over35":{
+      "filter": {
+        "range": {"age": {"gt": 35}}
+      },
+    "aggs": {"avg_bal": {"avg": {"field": "balance"} }}
+    }
+  }
+}
+```
+
+notice the main filter here is living inside `match` with a field name of `state.keyword` this is acquired usually by  seeing the result node before filtering it. notice that you can also filter using `gt` of this query, so this filter the `balance` average of the persons over 35 `gt = greater than ` and `gt != gte` so keep that in mind.
+
+## Finish 
+
+Ok this is enough commands, as for `update` and  `delete ` I'm not going to discuss it here for 2 main reasons:
+
+	1.	It's not usually good to manipulate logs from a client side connection
+ 	2.	it should be assigned an `outlier` by the search engine itself
+ 	3.	since the Log is time restricted *-it is associated with time stamp-*  you can't really update the values.
+
+So hope this is a good document
+
+### Always Feedback ASAP, Waiting in Slack. C yah! ;)
