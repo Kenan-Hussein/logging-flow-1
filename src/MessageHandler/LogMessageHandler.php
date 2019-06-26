@@ -10,6 +10,9 @@ class LogMessageHandler implements MessageHandlerInterface
 {
     public function __invoke(LogMessage $message)
     {
-        // ... do some work - like sending an SMS message!
+        //do some work - like sending message!
+        $output = $message->getContent();
+
+        echo $output;
     }
 }
