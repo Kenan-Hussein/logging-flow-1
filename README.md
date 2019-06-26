@@ -1,9 +1,6 @@
 # Logging Flow
 
-### Main goal:
-Call endpoint to see body message in following technologies:
-
-Elastic search.
+Call endpoint to send message
 
 
 
@@ -11,6 +8,7 @@ Elastic search.
 
  1. Symfony project.
  2. Messenger component.
+ 3. Transport for Kafka.
 
 
 
@@ -65,3 +63,49 @@ You're ready! To dispatch the message (and call the handler), inject the `messag
     // or use the shortcut
     $this->dispatchMessage(new SmsNotification('Look! I created a message!'));
 
+## Transport for Kafka (Not included in the files yet, Waiting for other information to be posted)
+#### To use a transport that's not supported like Kafka, Amazon SQS and Google Pub/Sub, We going to use Enqueue's transport:
+## Usage
+1.  Install the transport
+
+```
+composer req sroze/messenger-enqueue-transport
+```
+
+
+2. Configure the Enqueue bundle
+
+        .env
+     
+        ###> enqueue/enqueue-bundle ###
+        ENQUEUE_DSN=amqp://guest:guest@localhost:5672/%2f
+        ###< enqueue/enqueue-bundle ###
+3.  Configure Messenger's transport (that we will name  `amqp`) to use Enqueue's  `default`  transport:
+
+        #config/packages/messenger.yaml
+        
+         framework:
+                 messenger:
+                          transports:
+                                 amqp: enqueue://default
+ 4.  Route the messages that have to go through the message queue:
+
+    config/packages/framework.yaml
+    framework:
+        messenger:
+            # ...
+    
+            routing:
+                'App\Message\MyMessage': amqp    
+### Configure custom Kafka message
+Here is the way to send a message with with some custom options:
+
+    $this->bus->dispatch((new Envelope($message))->with(new TransportConfiguration([
+     'topic' => 'test_topic_name',
+     'metadata' => [
+     'key' => 'foo.bar',
+     'partition' => 0,
+     'timestamp' => (new \DateTimeImmutable())->getTimestamp(),
+     'messageId' => uniqid('kafka_', true),
+     ]
+    ])))
