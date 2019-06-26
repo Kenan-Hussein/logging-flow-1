@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Message\LogMessage;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 class LoggingController extends AbstractController
@@ -19,9 +18,9 @@ class LoggingController extends AbstractController
         //message text
         $message = "yah it is working";
 
-        $this->jsonMessage($message);
-
         $this->messengerMessage($message);
+
+        return $this->jsonMessage($message);
     }
 
     public function jsonMessage(string $message)
@@ -30,14 +29,13 @@ class LoggingController extends AbstractController
             [
                 'message' => $message,
             ],
-            JsonResponse::HTTP_OK
+            JsonResponse::HTTP_OK //since they advised to use this instead of the number
         );
     }
 
     public function messengerMessage(string $message)
     {
         // will cause the LogMessageHandler to be called
-         //$bus->dispatch(new LogMessage($message));
         $this->dispatchMessage(new LogMessage($message));
     }
 }

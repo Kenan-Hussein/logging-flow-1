@@ -10,9 +10,8 @@ class LogMessageHandler implements MessageHandlerInterface
 {
     public function __invoke(LogMessage $message)
     {
-        //do some work - like sending message!
+        //do some work - like print message!
         $output = $message->getContent();
-
         echo $output;
     }
 }
