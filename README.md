@@ -26,10 +26,16 @@ Make new controller then endpoint that will be called to send message body to Ka
 ## Concepts:
 **Sender:**
 Responsible for serializing and sending messages to  _something_. This something can be a message broker or a third party API for example.
+
+
 **Receiver:**
 Responsible for retrieving, deserializing and forwarding messages to handler(s). This can be a message queue puller or an API endpoint for example.
+
+
 **Handler:**
 Responsible for handling messages using the business logic applicable to the messages. Handlers are called by the  `HandleMessageMiddleware`  middleware.
+
+
 **Bus:**
 The bus is used to dispatch messages. The behavior of the bus is in its ordered middleware stack. The component comes with a set of middleware that you can use.
 
@@ -63,7 +69,9 @@ You're ready! To dispatch the message (and call the handler), inject the `messag
     // or use the shortcut
     $this->dispatchMessage(new SmsNotification('Look! I created a message!'));
 
-## Transport for Kafka (Not included in the files yet, Waiting for other information to be posted)
+
+## Transport for Kafka :
+##### (Not included in the files yet, Waiting for other information to be posted)
 #### To use a transport that's not supported like Kafka, Amazon SQS and Google Pub/Sub, We going to use Enqueue's transport:
 ## Usage
 1.  Install the transport
