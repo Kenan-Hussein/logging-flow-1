@@ -13,6 +13,11 @@ This Documents Shows How to install the fallowing components:
 
 `Logstash` --while starting success-- is stopping possible fix maybe to start `Logstash` as a service. Sooooo, We'll see.
 
+
+## If you've done configurations:
+
+
+
 ## Requirements
 
 1. JDK: I used v12
