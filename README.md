@@ -181,7 +181,7 @@ and write a message
 open another tab and write the command:
 
 ```
-./kafka/bin/windows/kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic yes_topic --from-beginning
+./bin/windows/kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic yes_topic --from-beginning
 ```
 
 you should be able to see the message here
