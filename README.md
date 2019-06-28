@@ -48,7 +48,7 @@ broker.id=0
 
 listeners=PLAINTEXT://:9092
 
-log.dir=/kafka-logs
+dataDir=E:\elk_example\kafka\Logz
 
 zookeeper.connect=localhost:2181
 
@@ -113,29 +113,17 @@ and inside this add the fallowing
  ```
 
 input {
-
-​    kafka {
-
-​            bootstrap_servers => "localhost:9092"
-
-​            topics => ["yes_topic"]
-
-​    }
-
+kafka {
+bootstrap_servers => "localhost:9092"
+topics => ["yes_topic"]
 }
-
+}
 output {
-
-   elasticsearch {
-
-​      hosts => ["localhost:9200"]
-
-​      index => "yes_topic"
-
-​      workers => 1
-
-​    }
-
+elasticsearch {
+hosts => ["localhost:9200"]
+index => "yes_topic"
+workers => 1
+}
 }
 
  ```
@@ -191,15 +179,10 @@ Now, Open the Kibana Website -- `localhost:5601` -- go to developer tools -- fro
  ```
 
 GET /yes_topic/_search
-
 {
-
   "query": {
-
-​    "match_all": {}
-
+     "match_all": {}
   }
-
 }
 
  ```
