@@ -48,7 +48,7 @@ broker.id=0
 
 listeners=PLAINTEXT://:9092
 
-dataDir=E:\elk_example\kafka\Logz
+dataDir=Logz
 
 zookeeper.connect=localhost:2181
 
