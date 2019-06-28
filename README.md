@@ -69,7 +69,7 @@ It should start showing some messages, that's how you know it's running
 run the fallowing command, while you are <b>on Kafka files directory </b>:
 
 ```
-./bin/windows/kafka-server-start.bat config/server.properties
+./bin/windows/kafka-server-start.bat ./config/server.properties
 ```
 
 again, some messages means that the thing actually work
