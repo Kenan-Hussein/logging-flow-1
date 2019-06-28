@@ -177,4 +177,4 @@ then start Kibana using the command
 
 `./bin/kibana.bat`
 
-this will take a while But when it's running it's Finally Over
+this will take a while But when it's running it's Finally Over go to `localhost:9200` on Chrome and that's it.
