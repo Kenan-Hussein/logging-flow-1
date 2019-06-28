@@ -2,8 +2,6 @@
 
 This Documents Shows How to install the fallowing components:
 
- 1. FileBeats: This API is there to analyze file components
-
  2. Kafka: This API is a queuing API
 
  3. Logstash: This API has some jobs to do with logs 
