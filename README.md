@@ -1,111 +1,178 @@
-# Logging Flow
+# Logging Pipeline 
 
-Call endpoint to send message
+This Documents Shows How to install the fallowing components:
 
-
-
-## Menu
-
- 1. Symfony project.
- 2. Messenger component.
- 3. Transport for Kafka.
-
+1. FileBeats: This API is there to analyze file components
+2. Kafka: This API is a queuing API
+3. Logstash: This API has some jobs to do with logs 
+4. Elastic Search: Search API, Similar in job to SQL but radically different API.
+5. Kibana: To Interact with Elastic Search 
+6. Grafana: To Draw the data.
 
 
-## Symfony project:
 
-    composer create-project symfony/skeleton 
-    composer require annotation
-    composer require maker
+## Requirements
 
-Make new controller then endpoint that will be called to send message body to Kafka.
+1. JDK: I used v12
+2. Node.JS for Kibana
 
 
-## Messenger component:
 
-## Concepts:
-**Sender:**
-Responsible for serializing and sending messages to  _something_. This something can be a message broker or a third party API for example.
-**Receiver:**
-Responsible for retrieving, deserializing and forwarding messages to handler(s). This can be a message queue puller or an API endpoint for example.
-**Handler:**
-Responsible for handling messages using the business logic applicable to the messages. Handlers are called by the  `HandleMessageMiddleware`  middleware.
-**Bus:**
-The bus is used to dispatch messages. The behavior of the bus is in its ordered middleware stack. The component comes with a set of middleware that you can use.
+## Installing The Materials
 
-## How to Use the Messenger?
-### Installation:
-In applications using [_Symfony Flex_](https://symfony.com/doc/4.2/setup/flex.html), run this command to install messenger before using it:
+1. File Beats: From elastic.co, mind that you need proxy to download,
 
-    composer require messenger
-### Message:
-Before you can send a message, you must create it first. There is no specific requirement for a message, except it should be serializable and unserializable by a Symfony Serializer instance.
-### Using the Messenger Service:
-Once enabled, the `message_bus` service can be injected in any service where you need it, like in a controller.
-### Registering Handlers:
-In order to do something when your message is dispatched, you need to create a message handler. It's a class with an `__invoke` method.
-### Transports:
-By default, messages are processed as soon as they are dispatched. If you prefer to process messages asynchronously, you must configure a transport. These transports communicate with your application via queuing systems or third parties.
-A transport is registered using a "DSN", which is a string that represents the connection credentials and configuration. By default, when you've installed the messenger component, the following configuration should have been created:
+   plus, the version I'm using is: `filebeat-7.2.0-windows-x86_64`
 
-> config/packages/messenger.yaml
+2. Kafka: Install from <https://kafka.apache.org/>, I'm using `kafka_2.12-2.3.0`
 
-    framework:
-        messenger:
-            transports:
-                amqp: "%env(MESSENGER_TRANSPORT_DSN)%"
+3. Logstash: Install from <https://elasic.co/>  I'm using `logstash-7.2.0`
 
-### Dispatching the Message:
-You're ready! To dispatch the message (and call the handler), inject the `message_bus` service (via the `MessageBusInterface`), like in a controller:
+4. Elastic Search: Install from <https://elastic.co/>, I'm using `elasticsearch-7.1.1`
 
-    $bus->dispatch(new SmsNotification('Look! I created a message!'));
-   
-    // or use the shortcut
-    $this->dispatchMessage(new SmsNotification('Look! I created a message!'));
+5. Kibana: Install from <https://elastic.co/>, I'm using `kibana-7.1.1-windows-x86_64`
 
-## Transport for Kafka (Not included in the files yet, Waiting for other information to be posted)
-#### To use a transport that's not supported like Kafka, Amazon SQS and Google Pub/Sub, We going to use Enqueue's transport:
-## Usage
-1.  Install the transport
+
+
+### Configurating Zookeeper (Kafka)
+
+Check The Fallowing Lines in `config/zookeeper.properties`
+
+`clientPort=2181`
+
+and on `config/server.properties`the fallowing:
 
 ```
-composer req sroze/messenger-enqueue-transport
+broker.id=0
+listeners=PLAINTEXT://:9092
+log.dir=/kafka-logs
+zookeeper.connect=localhost:2181
+```
+
+### Starting Zookeeper 
+
+run the fallowing command, while you are <b>on Kafka files directory </b>:
+
+`./bin/windows/zookeeper-server-start.bat ./config/zookeeper.properties`
+
+It should start showing some messages, that's how you know it's running
+
+### Starting Kafka Server
+
+run the fallowing command, while you are <b>on Kafka files directory </b>:
+
+`./bin/windows/kafka-server-start.bat config/server.properties`
+
+again, some messages means that the thing actually work
+
+### Configuring Elastic Search
+
+Make sure the fallowing lines are not commented on `/config/elasticsearch.yml`
+
+```
+cluster.name: Yes-Soft-App
+node.name: TEST-NODE-1
+#network.host: 0.0.0.0
+http.port: 9200
+```
+
+### Running Elastic Search Engine
+
+run the fallowing command, while you are <b>In Elastic Search Files Directory</b>:
+
+`./bin/elasticsearch.bat`
+
+Some messages and you're ok
+
+### Filebeat Configuration
+
+1. Uncomment the fallowing 
+
+```
+multiline.pattern: ^\[
+multiline.negate: false
+multiline.match: after
+```
+
+2. Replace the fallowing lines
+
+```
+# output.elasticsearch:
+  # Array of hosts to connect to.
+  # hosts: ["localhost:9200"]
+```
+
+​	With the lines:
+
+```
+output.kafka:
+ hosts: ["localhost:9092"]
+ topic: APP-1-TOPIC
 ```
 
 
-2. Configure the Enqueue bundle
 
-        .env
-     
-        ###> enqueue/enqueue-bundle ###
-        ENQUEUE_DSN=amqp://guest:guest@localhost:5672/%2f
-        ###< enqueue/enqueue-bundle ###
-3.  Configure Messenger's transport (that we will name  `amqp`) to use Enqueue's  `default`  transport:
+## Logstash Configuration and Start
 
-        #config/packages/messenger.yaml
-        
-         framework:
-                 messenger:
-                          transports:
-                                 amqp: enqueue://default
- 4.  Route the messages that have to go through the message queue:
+In your Logstash Directory create the fallowing: 
 
-    config/packages/framework.yaml
-    framework:
-        messenger:
-            # ...
-    
-            routing:
-                'App\Message\MyMessage': amqp    
-### Configure custom Kafka message
-Here is the way to send a message with with some custom options:
+`/bin/logstash-app1.conf` 
 
-    $this->bus->dispatch((new Envelope($message))->with(new TransportConfiguration([
-     'topic' => 'test_topic_name',
-     'metadata' => [
-     'key' => 'foo.bar',
-     'partition' => 0,
-     'timestamp' => (new \DateTimeImmutable())->getTimestamp(),
-     'messageId' => uniqid('kafka_', true),
-     ]
-    ])))
+and inside this add the fallowing
+
+```
+input {
+     kafka {
+            bootstrap_servers => 'localhost:9092'
+            topics => ["APP-1-TOPIC"]
+            codec => json {}
+          }
+}
+filter
+{
+//parse log line
+      grok
+    {
+    match => {"message" => "\A%{TIMESTAMP_ISO8601:timestamp}\s+%{LOGLEVEL:loglevel}\s+(?<logger>(?:[a-zA-Z0-9-]+\.)*[A-Za-z0-9$]+)\s+(-\s+)?(?=(?<msgnr>[A-Z]+[0-9]{4,5}))*%{DATA:message}({({[^}]+},?\s*)*})?\s*$(?<stacktrace>(?m:.*))?" }
+    }  
+ 
+    #Remove unused fields
+    #mutate { remove_field =>["beat","@version" ]}
+}
+output {
+    #Output result sent to elasticsearch and dynamically create array
+    elasticsearch {
+        index  => "app1-logs-%{+YYYY.MM.dd}"
+        hosts => ["localhost:9200"]
+        sniffing => false
+    }
+ 
+     #Sysout logs
+     stdout
+       {
+         codec => rubydebug
+       }
+}
+```
+
+Test the config using the command: `./logstash.bat -t -f logstash-app1.conf`
+
+There will be some warnings BUT you should be able to see the status as `OK`
+
+Then start the `logstash ` using the command: `./logstash.bat -f logstash-app1.conf`
+
+### Finally Kibana
+
+Change the fallowing file `config/kibana.yml ` and uncomment the fallowing:
+
+```
+server.port: 5601
+server.host: localhost
+elasticsearch.hosts: ["http://localhost:9200"]
+```
+
+then start Kibana using the command
+
+`./bin/kibana.bat`
+
+this will take a while But when it's running it's Finally Over
