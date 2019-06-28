@@ -205,3 +205,14 @@ GET /yes_topic/_search
  ```
 
 and watch the messages rolling in the second output screen
+
+
+
+#### Add Topic 
+
+run the command 
+
+```
+./bin/windows/kafka-topics.bat --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic mohammad
+```
+
