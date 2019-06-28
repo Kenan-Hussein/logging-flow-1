@@ -9,7 +9,9 @@ This Documents Shows How to install the fallowing components:
 5. Kibana: To Interact with Elastic Search 
 6. Grafana: To Draw the data.
 
+## Known Bugs
 
+`Logstash` --while starting success-- is stopping possible fix maybe to start `Logstash` as a service. Sooooo, We'll see.
 
 ## Requirements
 
