@@ -76,7 +76,7 @@ again, some messages means that the thing actually work
 
  ### Configuring Elastic Search
 
-Make sure the fallowing lines are not commented on `/config/elasticsearch.yml`
+Make sure the fallowing lines are not commented on `./config/elasticsearch.yml`
 
  ```
 
