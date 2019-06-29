@@ -16,6 +16,20 @@ This Documents Shows How to install the fallowing components:
 
 No Bugs are Known at the moment
 
+
+
+## Notes
+
+Please 
+
+### <b>`Don't use spaces in kafka dir` </b>
+
+# EVER EVER
+
+# EVER
+
+
+
  ## Requirements
 
  1. JDK: I used v12
