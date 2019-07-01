@@ -15,7 +15,7 @@ Grafana connects with every possible data source, commonly referred to as databa
 7. Default login and password `admin`/ `admin` .
 8. To run Grafana open your browser and go to the port you configured above, e.g. `http://localhost:8080/`. 
 
-### Use Grafana 
+### The Basics Steps For Using Elasticsearch In Grafana 
 To Use Grafana We Have TO Follow These Steps :
 1. From Side Menu On Configuration Option We Select `Data Sources`
 2. Select The Data Sources We Want ex : `Elasticsearch`
@@ -24,3 +24,17 @@ To Use Grafana We Have TO Follow These Steps :
 5. Add New Panel
 6. Edit This Panel By Clicking On The Title And Select `Edit`
 7. By These Steps We Will Have First Simple Graph
+
+
+### Adding the data source
+1. In the side menu under the `Configuration` link you should find a link named `Data Sources`.
+2. Click the `+ Add data source` button in the top header.
+4. Select `Elasticsearch` from the Type dropdown.
+5. This window will be display
+
+![Elasticsearch Window](datasources_window.png "Elasticsearch data sources Window")
+
+    Name	: The data source name. This is how you refer to the data source in panels & queries.
+    Default	: Default data source means that it will be pre-selected for new panels.
+    Url     : The HTTP protocol, IP, and port of your Elasticsearch server.
+    Access	: Server (default) = URL needs to be accessible from the Grafana backend/server, Browser = URL needs to be accessible from the browser.
