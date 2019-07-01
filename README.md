@@ -14,3 +14,13 @@ Grafana connects with every possible data source, commonly referred to as databa
 6. Start Grafana by executing `grafana-server.exe`, located in the `bin` directory.
 7. Default login and password `admin`/ `admin` .
 8. To run Grafana open your browser and go to the port you configured above, e.g. `http://localhost:8080/`. 
+
+### Use Grafana 
+To Use Grafana We Have TO Follow These Steps :
+1. From Side Menu On Configuration Option We Select `Data Sources`
+2. Select The Data Sources We Want ex : `Elasticsearch`
+3. Inserted Our Data Into Elasticsearch Window
+4. Create New Dashboard
+5. Add New Panel
+6. Edit This Panel By Clicking On The Title And Select `Edit`
+7. By These Steps We Will Have First Simple Graph
