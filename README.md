@@ -38,3 +38,12 @@ To Use Grafana We Have TO Follow These Steps :
     Default	: Default data source means that it will be pre-selected for new panels.
     Url     : The HTTP protocol, IP, and port of your Elasticsearch server.
     Access	: Server (default) = URL needs to be accessible from the Grafana backend/server, Browser = URL needs to be accessible from the browser.
+
+
+## Result Until Now
+1. There is nothing to Say until now because grafana didn't display any graph after insert the `elastic url and data`
+2. grafana don't accept any index name that elastic provided as `(kafka_1, my-test, ...)`
+3. tomorrow i will change the way about learning and i will start about `HTTP API` in Grafana
+4. finally what the meaning of these two Phrases
+
+![grafana access](grafana_access.png "Grafana Elasticsearch Access")
