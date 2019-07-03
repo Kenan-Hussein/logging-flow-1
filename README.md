@@ -26,11 +26,24 @@ To Use Grafana We Have TO Follow These Steps :
 7. By These Steps We Will Have First Simple Graph
 
 
+### Important information you should know before start
+1. Must have an `ELK Stack (elasticsearch, Logstash, Kibana)` up and running on your device .
+2. Must create at least simple data from `Kibana` 
+
+![Kibana Simple Data](kibana_simple_data.png "Simple Kibana Data")
+
+3.fetching the `elasticsearch index name` from `/_cat/indices` as following :
+
+![Elasticsearch Index Name](elastic_indices.png "Elasticsearch Index Name")
+
 ### Adding the data source
-1. In the side menu under the `Configuration` link you should find a link named `Data Sources`.
-2. Click the `+ Add data source` button in the top header.
-4. Select `Elasticsearch` from the Type dropdown.
-5. This window will be display
+1- In the side menu under the `Configuration` link you should find a link named `Data Sources`.
+
+2- Click the `+ Add data source` button in the top header.
+
+3- Select `Elasticsearch` from the Type dropdown.
+
+4- This window will be display
 
 ![Elasticsearch Window](datasources_window.png "Elasticsearch data sources Window")
 
@@ -39,11 +52,25 @@ To Use Grafana We Have TO Follow These Steps :
     Url     : The HTTP protocol, IP, and port of your Elasticsearch server.
     Access	: Server (default) = URL needs to be accessible from the Grafana backend/server, Browser = URL needs to be accessible from the browser.
 
+5- add `index name` from `/_cat/indices`, We can ignore the pattern .
 
-## Result Until Now
-1. There is nothing to Say until now because grafana didn't display any graph after insert the `elastic url and data`
-2. grafana don't accept any index name that elastic provided as `(kafka_1, my-test, ...)`
-3. tomorrow i will change the way about learning and i will start about `HTTP API` in Grafana
-4. finally what the meaning of these two Phrases
+6- Time field is for `timestamp`
 
-![grafana access](grafana_access.png "Grafana Elasticsearch Access")
+7- version : is the version you use .
+
+![Elastic Data Source](elastic_data_source.png "Elastic Data Source")
+
+
+### Creating Grafana Dashboard
+1. Create new dashboard, and select `Add Query` .
+2. To edit the graph, you need to click the `panel title` and then `Edit`.
+3. Delete the fake data source that is using to help us get started, And then adding new query for our source data `ex :Elastic Matrics` .
+4. `Lucene query` use to filter our graph .
+5. From `Matric` field select one of the options `ex: count` .
+6. For `Group by` leave it for now on `data histogram` to `timestamp` .
+7. By These Steps We Will Have First Simple Graph
+8. for inserting two elasticsearch data source we will have something like below :
+
+![Grafana Dashboard](grafana_elk_dash.png "Grafana ELK Dashboard")
+
+
