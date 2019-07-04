@@ -2,6 +2,7 @@
 # Logging Flow
 
 Call endpoint to send message, log or json to out put, log file or Kafka.
+
 Receive message from Kafka in terminal. 
 
 
@@ -230,9 +231,9 @@ The following method contain the configuration for Kafka also send message to Ka
    2. Make new topic matching the topic name in your method
    3. Run **kafka console consumer** with same topic name
    4. Run `php bin/console server:run`
-	5. Call the method in your controller endpoint
-	6. Call the end point using *postman* or *browser*
-	7. You will see the message in  **kafka console consumer**
+  5. Call the method in your controller endpoint
+6. Call the end point using *postman* or *browser*
+7. You will see the message in  **kafka console consumer**
 
 ## 5. Receive message from Kafka
 Create new project
@@ -277,6 +278,6 @@ Create new php file call it Consumer and add following:
    2. Make new topic matching the topic name in your method
    3. Run **kafka console producer** with same topic name
    4. Run `php bin/console Consumer.php`
-	5. In new terminal tap run `php bin/console server:run`
-	6. Send message using **kafka console producer**
-	7. You will see the message in the second terminal tap
+5. In new terminal tap run `php bin/console server:run`
+6. Send message using **kafka console producer**
+7. You will see the message in the second terminal tap
