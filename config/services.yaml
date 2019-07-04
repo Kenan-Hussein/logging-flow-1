@@ -25,3 +25,15 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+    App\Controller\LoggingController:
+       arguments:
+           $logger: '@monolog.logger.elk'
+
+    service.elkformater:
+        class: Monolog\Formatter\LogstashFormatter
+        arguments:
+            - 'appName'
+            - ~
+            - ~
+            - ~
+            - 1
