@@ -75,7 +75,7 @@ class LoggingController extends AbstractController
         $producer = new Producer(function () {
             return [
                 [
-                    'topic' => 'ke',
+                    'topic' => 'yes',
                     'value' => 'Yes-Soft......message',
                     'key' => '',
                 ],
