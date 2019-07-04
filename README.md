@@ -1,27 +1,53 @@
+
 # Logging Flow
 
-Call endpoint to send message
+Call endpoint to send message, log or json to out put, log file or Kafka.
+Receive message from Kafka in terminal. 
 
 
 
 ## Menu
 
- 1. Symfony project.
+ 1. Symfony endpoint.
  2. Messenger component.
- 3. Transport for Kafka.
+ 3. Create log channel with special format
+ 4. Send message to Kafka
+ 5. Receive message from Kafka
 
 
+## 1. Symfony endpoint:
 
-## Symfony project:
-
-    composer create-project symfony/skeleton 
+    composer create-project symfony/skeleton logging-flow
     composer require annotation
     composer require maker
 
-Make new controller then endpoint that will be called to send message body to Kafka.
+Make new controller:
 
+    php bin/console make:controller LoggingController
 
-## Messenger component:
+ Then endpoint that will be called:
+
+     /**  
+     * @Route("/logging", name="logging")  
+     */
+    public function postLog()  
+    {  
+	    //message text  
+        $message = "yah it is working";  
+      
+        return $this->jsonMessage($message);  
+    }  
+      
+    public function jsonMessage(string $message)  
+    {  
+	    return new JsonResponse(  
+		    [  'message' => $message,  
+	        ],  
+	        JsonResponse::HTTP_OK 
+      );  
+    }
+
+## 2. Messenger component:
 
 ## Concepts:
 **Sender:**
@@ -70,50 +96,187 @@ You're ready! To dispatch the message (and call the handler), inject the `messag
     $this->dispatchMessage(new SmsNotification('Look! I created a message!'));
 
 
-## Transport for Kafka :
-##### (Not included in the files yet, Waiting for other information to be posted)
-#### To use a transport that's not supported like Kafka, Amazon SQS and Google Pub/Sub, We going to use Enqueue's transport:
-## Usage
-1.  Install the transport
+## 3. Create log channel with special format :
+Store log messages in special log file. 
+*To do that we will create channel*
 
-```
-composer req sroze/messenger-enqueue-transport
-```
+We need Monolog:
 
+    composer require symfony/monolog-bundle
 
-2. Configure the Enqueue bundle
+Or
 
-        .env
-     
-        ###> enqueue/enqueue-bundle ###
-        ENQUEUE_DSN=amqp://guest:guest@localhost:5672/%2f
-        ###< enqueue/enqueue-bundle ###
-3.  Configure Messenger's transport (that we will name  `amqp`) to use Enqueue's  `default`  transport:
+    composer require monolog
+In packages folder create new file let us call it **monolog.yaml**    
+Add following :
 
-        #config/packages/messenger.yaml
-        
-         framework:
-                 messenger:
-                          transports:
-                                 amqp: enqueue://default
- 4.  Route the messages that have to go through the message queue:
+    monolog:  
+        channels: ["elk"]
+This will create the channel        
 
-    config/packages/framework.yaml
-    framework:
-        messenger:
-            # ...
+Now we want to make the log message has special format for example let us use format suit Logstash:
+In **config\services.yaml** add following :
+
+    service.elkformater:  
+        class: Monolog\Formatter\LogstashFormatter  
+        arguments:  
+            - 'appName'  
+		    - ~  
+            - ~  
+            - ~  
+            - 1
+Now in **config\packages\dev\monolog.yaml** add under *main* the following:
+
+    elk:  
+        type: stream  
+        path: "%kernel.logs_dir%/elk.log"  
+        formatter: service.elkformater  
+        level: info  
+        channels: ["elk"]
+Notice that path have the path and name of log file. For this example log file will create in **var\log\elk.log**        
+### Testing
+We need server for testing
+
+    composer require server
+
+Run the server by typing:
+
+    php bin/console server:run
+Add this to your controller:
+
+    /**  
+     * @var LoggerInterface  
+     */
+    private $logger;  
+      
+    public function __construct(LoggerInterface $logger)  
+    {  
+      $this->logger = $logger;  
+    }  
+      
+    /**  
+     * @Route("/logging", name="logging")  
+     */
+    public function postLog()  
+    {  
+      //message text  
+      $message = "yah it is working";  
+      
+      $this->elkLogger($message);        
+    }
     
-            routing:
-                'App\Message\MyMessage': amqp    
-### Configure custom Kafka message
-Here is the way to send a message with with some custom options:
+    public function elkLogger($message)  
+    {    
+      $this->logger->info($message);  
+    }
 
-    $this->bus->dispatch((new Envelope($message))->with(new TransportConfiguration([
-     'topic' => 'test_topic_name',
-     'metadata' => [
-     'key' => 'foo.bar',
-     'partition' => 0,
-     'timestamp' => (new \DateTimeImmutable())->getTimestamp(),
-     'messageId' => uniqid('kafka_', true),
-     ]
-    ])))
+Copy the endpoint  link to post man or your browser.
+
+## 4. Send message to Kafka
+### Requirements
+
+-   Minimum PHP version: 7.1
+-   Kafka version greater than 0.8
+-   The consumer module needs kafka broker version greater than 0.9.0
+
+### Composer Install
+Add this to composer.json file :
+```
+{
+	"require": {
+		"nmred/kafka-php": "0.2.*"
+	}
+}
+```
+Then run:
+
+    composer update
+    
+The following method contain the configuration for Kafka also send message to Kafka:
+
+    public function sendToKafka()  
+    {  
+      $config = ProducerConfig::getInstance();  
+      $config->setMetadataRefreshIntervalMs(10000);  
+      $config->setMetadataBrokerList('127.0.0.1:9092');  
+      $config->setBrokerVersion('1.0.0');  
+      $config->setRequiredAck(1);  
+      $config->setIsAsyn(false);  
+      $config->setProduceInterval(500);  
+      
+      $producer = new Producer(function () {  
+	      return [  
+		      [  'topic' => 'yes',  
+			     'value' => 'Yes-Soft......message',  
+			     'key' => '',  
+		      ],  
+	      ];  
+      });  
+      
+      $producer->success(function ($result): void {  
+	      var_dump($result);  
+      });  
+      
+      $producer->error(function ($errorCode): void {  
+	     var_dump($errorCode);  
+      });  
+      
+      $producer->send(true);  
+    }  
+   ### Testing
+   
+
+  1. Run **ZooKeeper** server and **Kafka** server
+   2. Make new topic matching the topic name in your method
+   3. Run **kafka console consumer** with same topic name
+   4. Run `php bin/console server:run`
+	5. Call the method in your controller endpoint
+	6. Call the end point using *postman* or *browser*
+	7. You will see the message in  **kafka console consumer**
+
+## 5. Receive message from Kafka
+Create new project
+
+### Composer Install
+Add this to composer.json file :
+```
+{
+	"require": {
+		"nmred/kafka-php": "0.2.*"
+	}
+}
+```
+Then run:
+
+    composer update
+
+Create new php file call it Consumer and add following:
+
+    <?php
+    
+    use Kafka\Consumer;
+    use Kafka\ConsumerConfig;
+    
+    require './vendor/autoload.php';
+    
+    $config = ConsumerConfig::getInstance();
+    $config->setMetadataRefreshIntervalMs(10000);
+    $config->setMetadataBrokerList('127.0.0.1:9092');
+    $config->setGroupId('yes');
+    $config->setBrokerVersion('1.0.0');
+    $config->setTopics(['yes']);
+    $config->setOffsetReset('earliest');
+    $consumer = new Consumer();
+    
+    $consumer->start(function($topic, $part, $message) {
+        var_dump($message);
+    });
+
+   ## Testing
+   1. Run **ZooKeeper** server and **Kafka** server
+   2. Make new topic matching the topic name in your method
+   3. Run **kafka console producer** with same topic name
+   4. Run `php bin/console Consumer.php`
+	5. In new terminal tap run `php bin/console server:run`
+	6. Send message using **kafka console producer**
+	7. You will see the message in the second terminal tap
